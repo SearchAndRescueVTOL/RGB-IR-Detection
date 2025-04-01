@@ -11,7 +11,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-BATCH_SIZE = 64
+BATCH_SIZE = 1
 class TransformerDecoderLayer(nn.Module):
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, activation="gelu",attn_dropout=None, act_dropout=None, normalize_before=False):
         super(TransformerDecoderLayer, self).__init__()
