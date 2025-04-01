@@ -385,8 +385,9 @@ class DETR_Neck(nn.Module):
         #  
         #  Now feed those into decoder as (x, memory, pos_embed = feature maps pos enc, query_pos_embed = obj query pos enc)
         ## todo: implement neck
-model = DETR_Backbone(4)
-neck = DETR_Neck()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = DETR_Backbone(4).to(device)
+neck = DETR_Neck().to(device)
 image = cv2.imread("rgb.jpg")  # Replace with your image path
 transform = transforms.Compose([
     transforms.ToTensor()  # Converts to tensor and normalizes to [0,1]
@@ -402,7 +403,7 @@ tensor_image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to (C, H, W)
 tensor_image = tensor_image.unsqueeze(0)
 print(tensor_image.shape)
 new_channel = torch.randn(1,1,640,640)
-tensor_image = torch.cat([tensor_image,new_channel], dim=1)
+tensor_image = torch.cat([tensor_image,new_channel], dim=1).to(device)
 x = (time.time())
 out = model(tensor_image)
 out = neck(out)
