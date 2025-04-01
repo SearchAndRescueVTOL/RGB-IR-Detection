@@ -214,7 +214,8 @@ class AIFI(nn.Module):
       else:
           pos_embed = getattr(self, 'pos_embed', None).to(x.device)
       x = self.transformer_encoder(x, pos_emb = pos_embed)
-      
+      x = x.view(BATCH_SIZE, 20, 20, self.hidden_dim)
+      x=x.permute(0, 3, 1, 2)
       return x
 
 class EDF_FAM(nn.Module):
@@ -387,7 +388,7 @@ class DETR_Neck(nn.Module):
         #  
         #  Now feed those into decoder as (x, memory, pos_embed = feature maps pos enc, query_pos_embed = obj query pos enc)
         ## todo: implement neck
-model = DETR_Backbone(3)
+model = DETR_Backbone(4)
 neck = DETR_Neck()
 image = cv2.imread("rgb.jpg")  # Replace with your image path
 transform = transforms.Compose([
@@ -403,6 +404,8 @@ image = image.astype("float32") / 255.0
 tensor_image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to (C, H, W)
 tensor_image = tensor_image.unsqueeze(0)
 print(tensor_image.shape)
+new_channel = torch.randn(1,1,640,640)
+tensor_image = torch.cat([tensor_image,new_channel], dim=1)
 out = model(tensor_image)
 out = neck(out)
 print(out.shape)
