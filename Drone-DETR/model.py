@@ -357,6 +357,7 @@ def positional_encoding_2d(height, width, d_model):
 
 class DETR_Neck(nn.Module):
     def __init__(self):
+        super().__init__()
         self.d_model = 512
         self.obj_queries = nn.Parameter(torch.randn(100, BATCH_SIZE, self.d_model)) ## 100 object queries (predict 100 bboxes)
         self.queryPosEmbed = nn.Parameter(torch.randn(100, BATCH_SIZE, self.d_model))
