@@ -363,6 +363,7 @@ class DETR_Neck(nn.Module):
         self.decoder = RTDETRDecoder(num_classes=1)
         self.encoder = AIFI()
         self.conv1 = Conv(256, 256)
+
         
         pass
     def forward(self, outputs):
@@ -370,9 +371,12 @@ class DETR_Neck(nn.Module):
         second = outputs[1]
         third = outputs[2]
         fourth = outputs[3]
-        print(fourth.shape)
+        print("first:",first.shape)
+        print("second:", second.shape)
+        print("third:", third.shape)
+        print("fourth:", fourth.shape)
         x = self.encoder(fourth)
-        print(x.shape)
+        
         ## ...
         # feature_maps = torch.randn(batch_size, channels /// should match decoder d_model, height, width)
         # memory = feature_maps.flatten(2).permute(2, 0, 1)  # (H*W, B, C)
@@ -386,6 +390,7 @@ class DETR_Neck(nn.Module):
         #  Now feed those into decoder as (x, memory, pos_embed = feature maps pos enc, query_pos_embed = obj query pos enc)
         ## todo: implement neck
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 model = DETR_Backbone(4).to(device)
 neck = DETR_Neck().to(device)
 image = cv2.imread("rgb.jpg")  # Replace with your image path
