@@ -372,20 +372,22 @@ class DETR_Neck(nn.Module):
         second = outputs[1]
         third = outputs[2]
         fourth = outputs[3]
-
+        fifth = self.encoder(fourth)
+        print(fifth.shape)
         ## ...
         # feature_maps = torch.randn(batch_size, channels /// should match decoder d_model, height, width)
-        memory = feature_maps.flatten(2).permute(2, 0, 1)  # (H*W, B, C)
-        x = self.obj_queries
-        pos_encoding = positional_encoding_2d(feature_maps.size(2), feature_maps.size(3), self.d_model)  # (H, W, C)
-        pos_embed = pos_encoding.flatten(0, 1).unsqueeze(1)  
-        pos_embed = pos_embed.expand(-1, BATCH_SIZE, -1)
-        out = self.decoder(x, memory, pos_embed = pos_embed, query_pos_embed = self.queryPosEmbed)
-        return out
+        # memory = feature_maps.flatten(2).permute(2, 0, 1)  # (H*W, B, C)
+        # x = self.obj_queries
+        # pos_encoding = positional_encoding_2d(feature_maps.size(2), feature_maps.size(3), self.d_model)  # (H, W, C)
+        # pos_embed = pos_encoding.flatten(0, 1).unsqueeze(1)  
+        # pos_embed = pos_embed.expand(-1, BATCH_SIZE, -1)
+        # out = self.decoder(x, memory, pos_embed = pos_embed, query_pos_embed = self.queryPosEmbed)
+        # return out
         #  
         #  Now feed those into decoder as (x, memory, pos_embed = feature maps pos enc, query_pos_embed = obj query pos enc)
         ## todo: implement neck
 model = DETR_Backbone(3)
+neck = DETR_Neck()
 image = cv2.imread("rgb.jpg")  # Replace with your image path
 transform = transforms.Compose([
     transforms.ToTensor()  # Converts to tensor and normalizes to [0,1]
@@ -401,4 +403,5 @@ tensor_image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to (C, H, W)
 tensor_image = tensor_image.unsqueeze(0)
 print(tensor_image.shape)
 out = model(tensor_image)
+out = neck(out)
 print(out.shape)
