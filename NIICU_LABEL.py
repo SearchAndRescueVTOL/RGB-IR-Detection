@@ -1,7 +1,7 @@
 import os
 
-dataset_root = "NII_CU_MAPD_dataset/4-channel/images"
-output_dir = "blended_dataset/labels"
+dataset_root = "/home/ubuntu/persistent/NII_CU_MAPD_dataset/4-channel/images"
+output_dir = "/home/ubuntu/persistent/blended_dataset/labels"
 
 os.makedirs(output_dir, exist_ok=True)
 

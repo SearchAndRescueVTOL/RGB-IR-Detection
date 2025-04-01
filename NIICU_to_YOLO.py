@@ -1,7 +1,7 @@
 import os
 
 
-dataset_root = "blended_dataset"
+dataset_root = "/home/ubuntu/persistent/blended_dataset"
 images_dir = os.path.join(dataset_root, "images")
 labels_dir = os.path.join(dataset_root, "labels")
 output_labels_dir = os.path.join(dataset_root, "labels_yolo")
