@@ -374,8 +374,9 @@ class DETR_Neck(nn.Module):
         second = outputs[1]
         third = outputs[2]
         fourth = outputs[3]
-        fifth = self.encoder(fourth)
-        print(fifth.shape)
+        print(fourth.shape)
+        x = self.encoder(fourth)
+        print(x.shape)
         ## ...
         # feature_maps = torch.randn(batch_size, channels /// should match decoder d_model, height, width)
         # memory = feature_maps.flatten(2).permute(2, 0, 1)  # (H*W, B, C)
