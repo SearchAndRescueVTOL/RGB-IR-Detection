@@ -7,12 +7,15 @@ output_dir = "blended_dataset/images"
 
 os.makedirs(output_dir, exist_ok=True)
 
-splits = ["train", "test"]
+splits = ["train", "val"]
 
 for split in splits:
     rgb_dir = os.path.join(dataset_root, "rgb", split)
     ir_dir = os.path.join(dataset_root, "thermal", split)
-    output_split_dir = os.path.join(output_dir, split)
+    if split == "val":
+        output_split_dir = os.path.join(output_dir, "test")
+    else:
+        output_split_dir = os.path.join(output_dir, split)
 
     os.makedirs(output_split_dir, exist_ok=True)
 

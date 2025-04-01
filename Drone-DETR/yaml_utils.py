@@ -1,5 +1,4 @@
-""""by lyuwenyu
-"""
+# https://github.com/lyuwenyu/RT-DETR/
 
 import os
 import yaml 

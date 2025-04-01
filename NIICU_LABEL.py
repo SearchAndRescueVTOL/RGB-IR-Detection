@@ -5,7 +5,7 @@ output_dir = "blended_dataset/labels"
 
 os.makedirs(output_dir, exist_ok=True)
 
-splits = ["train", "test"]
+splits = ["train", "val"]
 
 original_width, original_height = 2706, 1980 
 new_width, new_height = 640, 640
@@ -16,7 +16,10 @@ scale_y = new_height / original_height
 
 for split in splits:
     label_dir = os.path.join(dataset_root, "labels", split)
-    output_split_dir = os.path.join(output_dir, split)
+    if split == "val":
+        output_split_dir = os.path.join(output_dir, "test")
+    else:
+        output_split_dir = os.path.join(output_dir, split)
 
     os.makedirs(output_split_dir, exist_ok=True)
 

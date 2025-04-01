@@ -18,7 +18,16 @@ from box_ops import box_cxcywh_to_xyxy, box_iou, generalized_box_iou
 from dist import get_world_size, is_dist_available_and_initialized
 from yaml_utils import register
 
-
+# target = {
+#     "labels": torch.tensor([1, 2, 3]),  # Class labels for 3 target boxes
+#     "boxes": torch.tensor([[0.1, 0.2, 0.3, 0.4],  # (center_x, center_y, width, height)
+#                            [0.5, 0.6, 0.2, 0.3],
+#                            [0.7, 0.8, 0.1, 0.1]]),  # 3 boxes with normalized coordinates
+#     "masks": torch.tensor([[[0, 1, 0], [1, 0, 1], [0, 1, 0]],  # Binary mask for 1st box (H=3, W=3) (optional for instance segmentation)
+#                           [[1, 0, 1], [0, 1, 0], [1, 0, 1]],  # Binary mask for 2nd box (H=3, W=3)
+#                           [[0, 0, 0], [0, 1, 0], [0, 0, 0]]])  # Binary mask for 3rd box (H=3, W=3)
+# }
+# targets = list of target
 
 @register
 class SetCriterion(nn.Module):
