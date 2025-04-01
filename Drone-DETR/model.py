@@ -1,6 +1,4 @@
-import torch
 from torchvision import transforms
-import torch.nn as nn
 import torch.nn.functional as F
 from Conv import Conv, DCNv2
 from Blocks import C2f, Partial_conv3
@@ -8,12 +6,10 @@ import cv2
 import torch
 import torch.nn as nn
 import math
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+import time
 BATCH_SIZE = 1
 class TransformerDecoderLayer(nn.Module):
-    def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1, activation="gelu",attn_dropout=None, act_dropout=None, normalize_before=False):
+    def __init__(self, d_model, nhead, dim_feedforward=1024, dropout=0.1, activation="gelu",attn_dropout=None, act_dropout=None, normalize_before=False):
         super(TransformerDecoderLayer, self).__init__()
         attn_dropout = dropout if attn_dropout is None else attn_dropout
         act_dropout = dropout if act_dropout is None else act_dropout
@@ -109,7 +105,7 @@ class RTDETRDecoder(nn.Module):
         self.num_classes = num_classes
         d_model = 512
         nhead = 8
-        dim_feedforward = 2048
+        dim_feedforward = 1024
         dropout = 0.3 
         activation = "gelu"
 
@@ -407,6 +403,8 @@ tensor_image = tensor_image.unsqueeze(0)
 print(tensor_image.shape)
 new_channel = torch.randn(1,1,640,640)
 tensor_image = torch.cat([tensor_image,new_channel], dim=1)
+x = (time.time())
 out = model(tensor_image)
 out = neck(out)
+print(time.time() - x)
 print(out.shape)
