@@ -132,7 +132,7 @@ class EDF_FAM(nn.Module):
         ## second path
         p2 = self.conv2_1(cat)
         p2 = self.glob_avg_pool(p2)
-        print(p2.shape)
+        p2 = p2.view((1,256,1))
         p2_1 = self.conv2_2(p2)
         p2_2 = self.conv2_3(p2)
         p2_3 = self.conv2_4(p2)
