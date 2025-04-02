@@ -120,7 +120,6 @@ class EDF_FAM(nn.Module):
         self.conv2_3 = nn.Conv1d(1, 1, kernel_size=5, padding = 2)
         self.conv2_4 = nn.Conv1d(1, 1, kernel_size=3, padding = 1)
         self.conv2_5 = nn.Conv2d(3*in_channels, in_channels, kernel_size=1)
-        
         # combined now 
         self.sigmoid = nn.Sigmoid()
     def forward(self, x, y):
@@ -143,9 +142,7 @@ class EDF_FAM(nn.Module):
         p2_2 = p2_2.unsqueeze(-1).unsqueeze(-1) 
         p2_3 = p2_3.squeeze(1)
         p2_3 = p2_3.unsqueeze(-1).unsqueeze(-1) 
-        print("p2_3 shape:", p2_3.shape)
         p2 = torch.cat([p2_1, p2_2, p2_3], dim=1)
-        print("p2 shape:", p2.shape)
         p2 = self.conv2_5(p2)
 
         
@@ -280,6 +277,7 @@ class DETR_Neck(nn.Module):
         third = outputs[2]
         fourth = outputs[3]
         x = self.encoder(fourth)
+        print(x.shape)
         one = self.conv1(x)
         x = self.upsample1(one)
         two = self.edf1(x, third)
