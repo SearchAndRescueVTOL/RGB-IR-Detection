@@ -109,6 +109,7 @@ class AIFI(nn.Module):
 class EDF_FAM(nn.Module):
     def __init__(self, in_channels):
         ## first path
+        super().__init__()
         self.reluAct = nn.ReLU()
         self.conv1_1 = nn.Conv2d(2*in_channels, in_channels, kernel_size = 1)
         self.DCN = DCNv2(in_channels, in_channels, act=self.reluAct)
