@@ -116,9 +116,9 @@ class EDF_FAM(nn.Module):
         ## second path
         self.conv2_1 = Conv(2*in_channels, in_channels, k = 1, act=self.reluAct)
         self.glob_avg_pool = nn.AdaptiveAvgPool2d((1,1))
-        self.conv2_2 = nn.Conv1d(in_channels, in_channels, kernel_size=7)
-        self.conv2_3 = nn.Conv1d(in_channels, in_channels, kernel_size=5)
-        self.conv2_4 = nn.Conv1d(in_channels, in_channels, kernel_size=3)
+        self.conv2_2 = nn.Conv1d(1, 1, kernel_size=7)
+        self.conv2_3 = nn.Conv1d(1, 1, kernel_size=5)
+        self.conv2_4 = nn.Conv1d(1, 1, kernel_size=3)
         self.conv2_5 = nn.Conv2d(3*in_channels, in_channels, kernel_size=1)
         
         # combined now 
