@@ -268,14 +268,27 @@ class DETR_Neck(nn.Module):
         second = outputs[1]
         third = outputs[2]
         fourth = outputs[3]
-        print("first:",first.shape)
-        print("second:", second.shape)
-        print("third:", third.shape)
-        print("fourth:", fourth.shape)
         x = self.encoder(fourth)
-        first = self.conv1(x)
-        x = self.upsample1(first)
-        second = self.edf1(x)
+        one = self.conv1(x)
+        x = self.upsample1(one)
+        two = self.edf1(x, third)
+        x = self.upsample2(two)
+        three = self.edf2(x, second)
+        x = self.upsample3(three)
+        four = self.edf3(x, first)
+        x = self.conv2(four)
+        five = self.edf4(x, three)
+        x = self.conv3(five)
+        six = self.edf5(x, two)
+        x = self.conv4(six)
+        seven = self.edf6(x, one)
+        print("4:",four.shape)
+        print("five:", five.shape)
+        print("six:", six.shape)
+        print("seven:", seven.shape)
+
+
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 model = DETR_Backbone(4).to(device)
