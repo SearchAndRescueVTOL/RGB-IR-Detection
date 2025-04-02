@@ -2,8 +2,8 @@
 
 import torch 
 
-from .utils import inverse_sigmoid
-from .box_ops import box_cxcywh_to_xyxy, box_xyxy_to_cxcywh
+from utils import inverse_sigmoid
+from box_ops import box_cxcywh_to_xyxy, box_xyxy_to_cxcywh
 
 
 
