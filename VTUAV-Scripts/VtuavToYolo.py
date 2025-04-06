@@ -58,16 +58,16 @@ def process_json_file(json_file, output_dir, images_dir):
 
 if __name__ == "__main__":
     # Paths to the COCO JSON files and where to store YOLO labels
-    train_json = 'train_ir.json'
-    val_json = 'val_ir.json'
+    train_json = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/train_ir.json'
+    val_json = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/val_ir.json'
 
     # Directories to save labels
-    train_labels_dir = 'train/labels'
-    val_labels_dir = 'validation/labels'
+    train_labels_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/train/labels'
+    val_labels_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/validation/labels'
     
     # Directories where images are stored
-    train_images_dir = 'train/images'
-    val_images_dir = 'validation/images'
+    train_images_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/train/images'
+    val_images_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/validation/images'
 
     # Convert training data
     process_json_file(train_json, train_labels_dir, train_images_dir)
