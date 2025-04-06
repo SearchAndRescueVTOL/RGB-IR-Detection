@@ -25,4 +25,4 @@ if __name__ == "__main__":
     
     if json_dict:
         print("✅ JSON successfully parsed into a dictionary!")
-        print(json_dict)  # Print the parsed dictionary
+        print(json_dict.keys())  # Print the parsed dictionary
