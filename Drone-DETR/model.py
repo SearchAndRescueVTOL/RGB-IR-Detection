@@ -150,8 +150,8 @@ class EDF_FAM(nn.Module):
         merge = self.sigmoid(merge)
         z1 = merge * x
         z2 = (1 - merge) * y
-        # out = torch.cat([z1,z2], dim=1) #this is according to paper
-        out = z1 + z2
+        out = torch.cat([z1,z2], dim=1) #this is according to paper
+        # out = z1 + z2
         return out
 
 class FastResidual1(nn.Module):
@@ -296,7 +296,7 @@ class DETR_Neck(nn.Module):
         print("five:", five.shape)
         print("six:", six.shape)
         print("seven:", seven.shape)
-
+        decoderEntry = 
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
