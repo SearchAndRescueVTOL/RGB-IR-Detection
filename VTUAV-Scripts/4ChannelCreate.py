@@ -16,29 +16,31 @@ os.makedirs(train_output_dir, exist_ok=True)
 os.makedirs(val_output_dir, exist_ok=True)
 
 # Function to add IR as a 4th channel to the RGB image and save as .tiff
+from PIL import TiffImagePlugin
+
 def create_4c_image(rgb_path, ir_path, output_path):
     # Open the RGB image
-    rgb_image = Image.open(rgb_path).convert('RGB')
-    # Open the IR image (assuming grayscale, convert to 2D array)
-    ir_image = Image.open(ir_path).convert('L')
+    rgb_image = Image.open(rgb_path).convert('RGB')  # (H, W, 3)
+    ir_image = Image.open(ir_path).convert('L')  # (H, W), Grayscale
     
-    # Convert both images to numpy arrays
-    rgb_array = np.array(rgb_image)
-    ir_array = np.array(ir_image)
+    # Convert images to NumPy arrays
+    rgb_array = np.array(rgb_image)  # Shape: (H, W, 3)
+    ir_array = np.array(ir_image)  # Shape: (H, W)
     
-    # Ensure the IR array has the same height and width as the RGB image
-    if rgb_array.shape[0] != ir_array.shape[0] or rgb_array.shape[1] != ir_array.shape[1]:
+    # Ensure IR has same spatial dimensions as RGB
+    if rgb_array.shape[:2] != ir_array.shape[:2]:
         raise ValueError(f"Image size mismatch: RGB {rgb_array.shape} vs IR {ir_array.shape}")
-    
-    # Stack the IR array as a 4th channel
-    ir_array_4c = np.expand_dims(ir_array, axis=-1)  # Convert 2D to 3D (height, width, 1)
-    new_image_array = np.concatenate((rgb_array, ir_array_4c), axis=-1)  # Add IR as 4th channel
-    
-    # Convert the new 4-channel image to a PIL Image
-    new_image = Image.fromarray(new_image_array)
-    
-    # Save the new image as .tiff
-    new_image.save(output_path, format='TIFF')
+
+    # Expand IR to match RGB shape (H, W, 1) and concatenate
+    ir_array_4c = np.expand_dims(ir_array, axis=-1)  # Shape: (H, W, 1)
+    new_image_array = np.concatenate((rgb_array, ir_array_4c), axis=-1)  # Shape: (H, W, 4)
+
+    # Convert back to Image format as a raw 4-channel TIFF
+    new_image = Image.fromarray(new_image_array.astype(np.uint8), mode='RGBA')  
+
+    # Save using TIFF format with explicit 4-channel settings
+    new_image.save(output_path, format='TIFF', save_all=True)
+
 
 # Function to process images in a given directory
 # Update the code for replacing the extension only

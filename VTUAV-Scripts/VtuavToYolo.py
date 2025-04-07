@@ -32,7 +32,8 @@ def coco_to_yolo(coco_data, output_dir, images_dir):
         
         # Get the category ID and map to class label
         category_id = annotation['category_id']
-        class_id = category_id - 1  # YOLO format assumes 0-indexed class IDs
+
+        class_id = category_id
 
         # Prepare the YOLO format line
         yolo_line = f"{class_id} {center_x} {center_y} {norm_width} {norm_height}\n"
@@ -62,12 +63,12 @@ if __name__ == "__main__":
     val_json = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/val_ir.json'
 
     # Directories to save labels
-    train_labels_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/train/labels'
-    val_labels_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/validation/labels'
+    train_labels_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/data/train/labels'
+    val_labels_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/data/validation/labels'
     
     # Directories where images are stored
-    train_images_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/train/images'
-    val_images_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/validation/images'
+    train_images_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/data/train/images'
+    val_images_dir = '/home/ubuntu/persistent/vtuav-det/VTUAV-det/data/validation/images'
 
     # Convert training data
     process_json_file(train_json, train_labels_dir, train_images_dir)
