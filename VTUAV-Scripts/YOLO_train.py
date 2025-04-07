@@ -1,5 +1,4 @@
 import sys
-sys.path.append('/home/ubuntu/ultralytics4channel')
 from ultralytics4channel import YOLO
 if __name__ == "__main__":
     model = YOLO("yolo8s.pt")
