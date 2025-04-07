@@ -1,0 +1,6 @@
+import sys
+sys.path.append('/home/ubuntu/ultralytics4channel')
+from ultralytics4channel import YOLO
+if __name__ == "__main__":
+    model = YOLO("yolo8s.pt")
+    results = model.train(data="data.yaml", epochs=100, imgsz=640, device=[0, 1])

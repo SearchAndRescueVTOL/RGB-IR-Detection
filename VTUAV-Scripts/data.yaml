@@ -1,0 +1,6 @@
+train: /home/ubuntu/persistent/vtuav-det/VTUAV-det/data/train/images
+val: /home/ubuntu/persistent/vtuav-det/VTUAV-det/data/validation/images
+
+nc: 4  # Assuming 4 classes
+
+names: ['person', 'rider', 'crowd', 'uncertain']  # List your classes
