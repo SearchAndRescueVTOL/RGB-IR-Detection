@@ -296,7 +296,6 @@ class DETR_Neck(nn.Module):
         print("five:", five.shape)
         print("six:", six.shape)
         print("seven:", seven.shape)
-        decoderEntry = 
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
