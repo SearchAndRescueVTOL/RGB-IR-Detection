@@ -41,6 +41,7 @@ def create_4c_image(rgb_path, ir_path, output_path):
     new_image.save(output_path, format='TIFF')
 
 # Function to process images in a given directory
+# Update the code for replacing the extension only
 def process_images(rgb_dir, ir_dir, output_dir):
     # Get all the image filenames (assuming the images have the same names)
     for rgb_filename in os.listdir(rgb_dir):
@@ -48,13 +49,17 @@ def process_images(rgb_dir, ir_dir, output_dir):
         ir_path = os.path.join(ir_dir, rgb_filename)  # IR images should have the same name as RGB images
         
         if os.path.exists(ir_path):  # Ensure corresponding IR image exists
-            output_path = os.path.join(output_dir, rgb_filename.replace('.jpg', '.tiff'))  # Save as .tiff
-            try:
-                # Create 4C image and save it
-                create_4c_image(rgb_path, ir_path, output_path)
-                print(f"Saved: {output_path}")
-            except Exception as e:
-                print(f"Error processing {rgb_filename}: {e}")
+            # Use os.path.splitext to split filename and extension
+            base_name, ext = os.path.splitext(rgb_filename)
+            if ext.lower() == '.jpg':  # Only replace .jpg extension
+                output_path = os.path.join(output_dir, base_name + '.tiff')  # Save as .tiff
+                try:
+                    # Create 4C image and save it
+                    create_4c_image(rgb_path, ir_path, output_path)
+                    print(f"Saved: {output_path}")
+                except Exception as e:
+                    print(f"Error processing {rgb_filename}: {e}")
+
 
 # Process the training images
 process_images(rgb_train_dir, ir_train_dir, train_output_dir)
