@@ -288,7 +288,7 @@ class RTDETRTransformerv2(nn.Module):
                  num_classes=80,
                  hidden_dim=256,
                  num_queries=300,
-                 feat_channels=[512, 1024, 2048], ## num channels of each scale of features
+                 feat_channels=[256, 256, 256], ## num channels of each scale of features
                  feat_strides=[8, 16, 32], # how much feature maps are down sampled relative to the original image input ie 20x20 for 640x640 image is a stride of 32
                  num_levels=3, # number of scales
                  num_points=4,
