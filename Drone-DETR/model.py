@@ -271,7 +271,7 @@ class DETR_Neck(nn.Module):
         self.edf5 = EDF_FAM(256)
         self.conv4 = Conv(256, 256, k=3, s=2)
         self.edf6 = EDF_FAM(256)
-    def forward(self, outputs):
+    def forward(self, outputs, targets):
         first = outputs[0]
         second = outputs[1]
         third = outputs[2]
@@ -295,7 +295,8 @@ class DETR_Neck(nn.Module):
         print("five:", five.shape)
         print("six:", six.shape)
         print("seven:", seven.shape)
-        
+        output = self.decoder((four, five, six, seven), targets)
+        return output
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
@@ -320,5 +321,4 @@ tensor_image = torch.cat([tensor_image,new_channel], dim=1).to(device)
 x = (time.time())
 out = model(tensor_image)
 out = neck(out)
-print(time.time() - x)
-print(out.shape)
+print(out.keys())
