@@ -318,14 +318,14 @@ transform = transforms.Compose([
 
 # Convert BGR to RGB (PyTorch models expect RGB)
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-image = cv2.resize(image, (640, 640), interpolation=cv2.INTER_AREA)
+image = cv2.resize(image, (1024, 1024), interpolation=cv2.INTER_AREA)
 image = image.astype("float32") / 255.0
 
 # Convert to PyTorch tensor and rearrange dimensions (H, W, C) → (C, H, W)
 tensor_image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to (C, H, W)
 tensor_image = tensor_image.unsqueeze(0)
 print(tensor_image.shape)
-new_channel = torch.randn(1,1,640,640)
+new_channel = torch.randn(1,1,1024,1024)
 tensor_image = torch.cat([tensor_image,new_channel], dim=1).to(device)
 x = (time.time())
 model.eval()
