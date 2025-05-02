@@ -5,8 +5,8 @@ from torch.utils.tensorboard import SummaryWriter
 import torch 
 from dist import *
 
-from _solver import BaseSolver
-from det_engine import train_one_epoch, GradScaler, Warmup, ExponentialMovingAverage
+from solver import BaseSolver
+from det_engine import train_one_epoch, GradScaler, Warmup, ExponentialMovingAverage, evaluate
 class DetSolver(BaseSolver):
     def __init__(self, model, cfg, criterion, train_dataloader, val_dataloader, device, lr, weight_decay, epochs, log_dir):
         super().__init__()
@@ -23,7 +23,7 @@ class DetSolver(BaseSolver):
         self.lr_warmup_scheduler= Warmup(self.lr_scheduler, 20)
         self.writer = SummaryWriter(log_dir)
         # Initialize other necessary attributes
-    def fit(self, log_dir):
+    def fit(self):
         print("Start training")
         self.model.train()
         args = self.cfg
@@ -72,14 +72,14 @@ class DetSolver(BaseSolver):
                     save_on_master(self.ema.module.state_dict(), checkpoint_path)
 
             module = self.ema.module if self.ema else self.model
-            # test_stats, coco_evaluator = evaluate(
-            #     module, 
-            #     self.criterion, 
-            #     self.postprocessor, 
-            #     self.val_dataloader, 
-            #     self.evaluator, 
-            #     self.device
-            # )
+            test_stats, coco_evaluator = evaluate(
+                module, 
+                self.criterion, 
+                self.postprocessor, 
+                self.val_dataloader, 
+                self.evaluator, 
+                self.device
+            )
 
             # TODO 
             for k in test_stats:
@@ -124,3 +124,14 @@ class DetSolver(BaseSolver):
         total_time = time.time() - start_time
         total_time_str = str(datetime.timedelta(seconds=int(total_time)))
         print('Training time {}'.format(total_time_str))
+    def val(self, ):
+        self.eval()
+        
+        module = self.ema.module if self.ema else self.model
+        test_stats, coco_evaluator = evaluate(module, self.criterion, self.postprocessor,
+                self.val_dataloader, self.evaluator, self.device)
+                
+        if self.output_dir:
+            save_on_master(coco_evaluator.coco_eval["bbox"].eval, self.output_dir / "eval.pth")
+        
+        return

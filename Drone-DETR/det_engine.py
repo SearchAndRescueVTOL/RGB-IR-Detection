@@ -11,6 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.cuda.amp.grad_scaler import GradScaler
 from torch.optim.lr_scheduler import LRScheduler
 import torch.distributed as tdist
+from cocoEval import CocoEvaluator
 from dist import is_dist_available_and_initialized, get_world_size, reduce_dict,is_main_process
 class ExponentialMovingAverage(torch.optim.swa_utils.AveragedModel):
     """Maintains moving averages of model parameters using an exponential decay.
@@ -358,4 +359,52 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+@torch.no_grad()
+def evaluate(model: torch.nn.Module, criterion: torch.nn.Module, postprocessor, data_loader, coco_evaluator: CocoEvaluator, device):
+    model.eval()
+    criterion.eval()
+    coco_evaluator.cleanup()
+    iou_types = coco_evaluator.iou_types
 
+    metric_logger = MetricLogger(delimiter="  ")
+    header = 'Test:'
+    
+    for samples, targets in metric_logger.log_every(data_loader, 10, header):
+        samples = samples.to(device)
+        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+
+        outputs = model(samples)
+
+        # TODO (lyuwenyu), fix dataset converted using `convert_to_coco_api`?
+        orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)
+        
+        results = postprocessor(outputs, orig_target_sizes)
+
+        # if 'segm' in postprocessor.keys():
+        #     target_sizes = torch.stack([t["size"] for t in targets], dim=0)
+        #     results = postprocessor['segm'](results, outputs, orig_target_sizes, target_sizes)
+
+        res = {target['image_id'].item(): output for target, output in zip(targets, results)}
+        if coco_evaluator is not None:
+            coco_evaluator.update(res)
+
+    # gather the stats from all processes
+    metric_logger.synchronize_between_processes()
+    print("Averaged stats:", metric_logger)
+    if coco_evaluator is not None:
+        coco_evaluator.synchronize_between_processes()
+
+    # accumulate predictions from all images
+    if coco_evaluator is not None:
+        coco_evaluator.accumulate()
+        coco_evaluator.summarize()
+
+    stats = {}
+    # stats = {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    if coco_evaluator is not None:
+        if 'bbox' in iou_types:
+            stats['coco_eval_bbox'] = coco_evaluator.coco_eval['bbox'].stats.tolist()
+        if 'segm' in iou_types:
+            stats['coco_eval_masks'] = coco_evaluator.coco_eval['segm'].stats.tolist()
+            
+    return stats, coco_evaluator
