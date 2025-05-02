@@ -55,7 +55,7 @@ class AIFI(nn.Module):
       self.num_layers = 1
       self.num_heads = 8
       self.dropout = 0.2
-      self.eval_spatial_size = [640,640]
+      self.eval_spatial_size = [1024,1024]
       self.pe_temperature = 10000
       self.projection = nn.Linear(256, self.hidden_dim)
       pos_embed = self.build_2d_sincos_position_embedding(
