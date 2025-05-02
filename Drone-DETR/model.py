@@ -29,8 +29,7 @@ class FFLayer(nn.Module):
 
 class TransformerEncoderLayer(nn.Module):
     
-    def __init__(self,hidden_dim,n_head,ffn_dim:int,dropout:float,activation:str = "ReLU"):  
-            
+    def __init__(self, hidden_dim, n_head, ffn_dim:int, dropout:float, activation:str = "ReLU"):            
         super().__init__()    
         self.mh_self_attn = nn.MultiheadAttention(hidden_dim, n_head, dropout, batch_first=True)
         self.feed_foward_nn = FFLayer(hidden_dim,ffn_dim,dropout,activation)
@@ -43,7 +42,7 @@ class TransformerEncoderLayer(nn.Module):
         x, attn_score = self.mh_self_attn(q, k, value=x, attn_mask=mask)
         x= residual + self.dropout(x)
         x = self.norm(x)
-         
+        
         x = self.feed_foward_nn(x)
 
         return x
@@ -296,7 +295,7 @@ class DETR_Neck(nn.Module):
         print("five:", five.shape)
         print("six:", six.shape)
         print("seven:", seven.shape)
-
+        
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)

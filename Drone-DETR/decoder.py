@@ -281,19 +281,19 @@ class TransformerDecoder(nn.Module):
         return torch.stack(dec_out_bboxes), torch.stack(dec_out_logits)
 
 
-class RTDETRTransformerv2(nn.Module):
+class RTDETRTransformerv2(nn.Module):# can optimize for inference time 
     __share__ = ['num_classes', 'eval_spatial_size']
 
     def __init__(self,
                  num_classes=80,
                  hidden_dim=256,
                  num_queries=300,
-                 feat_channels=[256, 256, 256], ## num channels of each scale of features
-                 feat_strides=[8, 16, 32], # how much feature maps are down sampled relative to the original image input ie 20x20 for 640x640 image is a stride of 32
-                 num_levels=3, # number of scales
+                 feat_channels=[256, 256, 256, 256], ## num channels of each scale of features
+                 feat_strides=[4, 8, 16, 32], # how much feature maps are down sampled relative to the original image input ie 20x20 for 640x640 image is a stride of 32
+                 num_levels=4, # number of scales
                  num_points=4,
                  nhead=8,
-                 num_layers=3,
+                 num_layers=6,
                  dim_feedforward=1024,
                  dropout=0.,
                  activation="relu",
