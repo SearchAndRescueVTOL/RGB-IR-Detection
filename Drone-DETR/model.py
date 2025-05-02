@@ -9,6 +9,7 @@ import math
 import time
 from decoder import RTDETRTransformerv2
 BATCH_SIZE = 1
+INPUT_SIZE = 1024
 class FFLayer(nn.Module):
     def __init__(self, embedd_dim,ffn_dim,dropout,activation):
         super().__init__()
@@ -55,7 +56,7 @@ class AIFI(nn.Module):
       self.num_layers = 1
       self.num_heads = 8
       self.dropout = 0.2
-      self.eval_spatial_size = [1024,1024]
+      self.eval_spatial_size = [INPUT_SIZE,INPUT_SIZE]
       self.pe_temperature = 10000
       self.projection = nn.Linear(256, self.hidden_dim)
       pos_embed = self.build_2d_sincos_position_embedding(
@@ -101,7 +102,7 @@ class AIFI(nn.Module):
       else:
           pos_embed = getattr(self, 'pos_embed', None).to(x.device)
       x = self.transformer_encoder(x, pos_emb = pos_embed)
-      x = x.view(BATCH_SIZE, 20, 20, self.hidden_dim)
+      x = x.view(BATCH_SIZE, INPUT_SIZE/16, INPUT_SIZE/16, self.hidden_dim)
       x=x.permute(0, 3, 1, 2)
       return x
 
