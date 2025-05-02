@@ -271,7 +271,7 @@ class DETR_Neck(nn.Module):
         self.edf5 = EDF_FAM(256)
         self.conv4 = Conv(256, 256, k=3, s=2)
         self.edf6 = EDF_FAM(256)
-    def forward(self, outputs, targets):
+    def forward(self, outputs, targets=None):
         first = outputs[0]
         second = outputs[1]
         third = outputs[2]
