@@ -102,7 +102,7 @@ class AIFI(nn.Module):
       else:
           pos_embed = getattr(self, 'pos_embed', None).to(x.device)
       x = self.transformer_encoder(x, pos_emb = pos_embed)
-      x = x.view(BATCH_SIZE, INPUT_SIZE/16, INPUT_SIZE/16, self.hidden_dim)
+      x = x.view(BATCH_SIZE, INPUT_SIZE//16, INPUT_SIZE//16, self.hidden_dim)
       x=x.permute(0, 3, 1, 2)
       return x
 
