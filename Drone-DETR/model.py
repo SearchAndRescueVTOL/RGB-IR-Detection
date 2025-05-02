@@ -9,7 +9,6 @@ import math
 import time
 from decoder import RTDETRTransformerv2
 BATCH_SIZE = 1
-INPUT_SIZE = 1024
 class FFLayer(nn.Module):
     def __init__(self, embedd_dim,ffn_dim,dropout,activation):
         super().__init__()
@@ -56,7 +55,7 @@ class AIFI(nn.Module):
       self.num_layers = 1
       self.num_heads = 8
       self.dropout = 0.2
-      self.eval_spatial_size = [INPUT_SIZE,INPUT_SIZE]
+      self.eval_spatial_size = [640,640]
       self.pe_temperature = 10000
       self.projection = nn.Linear(256, self.hidden_dim)
       pos_embed = self.build_2d_sincos_position_embedding(
@@ -102,7 +101,7 @@ class AIFI(nn.Module):
       else:
           pos_embed = getattr(self, 'pos_embed', None).to(x.device)
       x = self.transformer_encoder(x, pos_emb = pos_embed)
-      x = x.view(BATCH_SIZE, INPUT_SIZE//16, INPUT_SIZE//16, self.hidden_dim)
+      x = x.view(BATCH_SIZE, 20, 20, self.hidden_dim)
       x=x.permute(0, 3, 1, 2)
       return x
 
@@ -319,14 +318,14 @@ transform = transforms.Compose([
 
 # Convert BGR to RGB (PyTorch models expect RGB)
 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-image = cv2.resize(image, (1024, 1024), interpolation=cv2.INTER_AREA)
+image = cv2.resize(image, (640, 640), interpolation=cv2.INTER_AREA)
 image = image.astype("float32") / 255.0
 
 # Convert to PyTorch tensor and rearrange dimensions (H, W, C) → (C, H, W)
 tensor_image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to (C, H, W)
 tensor_image = tensor_image.unsqueeze(0)
 print(tensor_image.shape)
-new_channel = torch.randn(1,1,1024,1024)
+new_channel = torch.randn(1,1,640,640)
 tensor_image = torch.cat([tensor_image,new_channel], dim=1).to(device)
 x = (time.time())
 model.eval()
