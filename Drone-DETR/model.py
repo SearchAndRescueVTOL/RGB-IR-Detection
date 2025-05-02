@@ -297,11 +297,20 @@ class DETR_Neck(nn.Module):
         print("seven:", seven.shape)
         output = self.decoder((four, five, six, seven), targets)
         return output
-
+class DroneDETR(nn.Module):
+    def __init__(self, backbone, neck):
+        super().__init__()
+        self.backbone = backbone
+        self.neck = neck
+    def forward(self, x, targets=None):
+        x = self.backbone(x)
+        output = self.neck(x, targets)
+        return output
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
-model = DETR_Backbone(4).to(device)
+backbone = DETR_Backbone(4).to(device)
 neck = DETR_Neck().to(device)
+model = DroneDETR(backbone, neck).to(device)
 image = cv2.imread("rgb.jpg")  # Replace with your image path
 transform = transforms.Compose([
     transforms.ToTensor()  # Converts to tensor and normalizes to [0,1]
@@ -319,7 +328,6 @@ print(tensor_image.shape)
 new_channel = torch.randn(1,1,640,640)
 tensor_image = torch.cat([tensor_image,new_channel], dim=1).to(device)
 x = (time.time())
+model.eval()
 out = model(tensor_image)
-neck.eval()
-out = neck(out)
-print(out["pred_boxes"].keys())
+print(time.time() - x)
