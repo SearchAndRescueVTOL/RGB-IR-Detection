@@ -43,7 +43,7 @@ class Warmup(object):
         self.__dict__.update(state_dict)
 
     def get_warmup_factor(self, step, **kwargs):
-        raise NotImplementedError
+        return float(step) / float(max(1, self.warmup_duration))
 
     def step(self, ):
         self.last_step += 1
