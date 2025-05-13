@@ -12,6 +12,7 @@ from criterion import SetCriterion
 from matcher import HungarianMatcher
 import torch
 from torch.utils.data import Dataset, DataLoader
+from torch.utils.data.distributed import DistributedSampler
 import numpy as np
 import random
 
@@ -205,8 +206,8 @@ if __name__ == "__main__":
     train_dataset = DummyDetectionDataset(num_samples=200, num_classes=4)
     val_dataset = DummyDetectionDataset(num_samples=50, num_classes=4)
 
-    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, collate_fn=collate_fn)
-    val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, collate_fn=collate_fn)
+    train_loader = DistributedSampler(train_dataset, batch_size=8, shuffle=True)
+    val_loader = DistributedSampler(val_dataset, batch_size=8, shuffle=False)
     optim = torch.optim.AdamW(model.parameters(), lr=1e4, weight_decay=1e4)
     lr_sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=400, eta_min = 0)
     cfg = SimpleNamespace(checkpoint_freq=10,
