@@ -10,11 +10,25 @@ from det_engine import train_one_epoch, GradScaler, Warmup, ExponentialMovingAve
 from types import SimpleNamespace
 from criterion import SetCriterion
 from matcher import HungarianMatcher
-import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.distributed import DistributedSampler
 import numpy as np
 import random
+import os
+import sys
+import tempfile
+import torch.distributed as dist
+import torch.multiprocessing as mp
+from torch.nn.parallel import DistributedDataParallel as DDP
+def setup(rank, world_size):
+    os.environ['MASTER_ADDR'] = 'localhost'
+    os.environ['MASTER_PORT'] = '12355'
+
+    # initialize the process group
+    dist.init_process_group("gloo", rank=rank, world_size=world_size)
+
+def cleanup():
+    dist.destroy_process_group()
 
 class DummyDetectionDataset(Dataset):
     def __init__(self, num_samples=100, image_size=640, num_channels=4, num_classes=4, max_boxes=5):
@@ -186,6 +200,7 @@ class DetSolver(BaseSolver):
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
+    setup(1,0)
     backbone = DETR_Backbone(4).to(device)
     neck = DETR_Neck().to(device)
     model = DroneDETR(backbone, neck).to(device)
@@ -224,3 +239,4 @@ if __name__ == "__main__":
                           )
     solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e4, weight_decay = 1e4, epochs = 100, log_dir="./logs")
     solver.fit()
+    cleanup()
