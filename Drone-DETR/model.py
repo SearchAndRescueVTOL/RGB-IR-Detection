@@ -306,28 +306,28 @@ class DroneDETR(nn.Module):
         x = self.backbone(x)
         output = self.neck(x, targets)
         return output
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(device)
-backbone = DETR_Backbone(4).to(device)
-neck = DETR_Neck().to(device)
-model = DroneDETR(backbone, neck).to(device)
-image = cv2.imread("rgb.jpg")  # Replace with your image path
-transform = transforms.Compose([
-    transforms.ToTensor()  # Converts to tensor and normalizes to [0,1]
-])
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# print(device)
+# backbone = DETR_Backbone(4).to(device)
+# neck = DETR_Neck().to(device)
+# model = DroneDETR(backbone, neck).to(device)
+# image = cv2.imread("rgb.jpg")  # Replace with your image path
+# transform = transforms.Compose([
+#     transforms.ToTensor()  # Converts to tensor and normalizes to [0,1]
+# ])
 
-# Convert BGR to RGB (PyTorch models expect RGB)
-image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-image = cv2.resize(image, (640, 640), interpolation=cv2.INTER_AREA)
-image = image.astype("float32") / 255.0
+# # Convert BGR to RGB (PyTorch models expect RGB)
+# image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+# image = cv2.resize(image, (640, 640), interpolation=cv2.INTER_AREA)
+# image = image.astype("float32") / 255.0
 
-# Convert to PyTorch tensor and rearrange dimensions (H, W, C) → (C, H, W)
-tensor_image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to (C, H, W)
-tensor_image = tensor_image.unsqueeze(0)
-print(tensor_image.shape)
-new_channel = torch.randn(1,1,640,640)
-tensor_image = torch.cat([tensor_image,new_channel], dim=1).to(device)
-x = (time.time())
-model.eval()
-out = model(tensor_image)
-print(time.time() - x)
+# # Convert to PyTorch tensor and rearrange dimensions (H, W, C) → (C, H, W)
+# tensor_image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to (C, H, W)
+# tensor_image = tensor_image.unsqueeze(0)
+# print(tensor_image.shape)
+# new_channel = torch.randn(1,1,640,640)
+# tensor_image = torch.cat([tensor_image,new_channel], dim=1).to(device)
+# x = (time.time())
+# model.eval()
+# out = model(tensor_image)
+# print(time.time() - x)

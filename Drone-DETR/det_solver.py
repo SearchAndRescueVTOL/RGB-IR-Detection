@@ -4,9 +4,55 @@ import datetime
 from torch.utils.tensorboard import SummaryWriter
 import torch 
 from dist import *
-
+from model import DETR_Backbone, DETR_Neck, DroneDETR
 from solver import BaseSolver
 from det_engine import train_one_epoch, GradScaler, Warmup, ExponentialMovingAverage, evaluate
+from types import SimpleNamespace
+from criterion import SetCriterion
+from matcher import HungarianMatcher
+import torch
+from torch.utils.data import Dataset, DataLoader
+import numpy as np
+import random
+
+class DummyDetectionDataset(Dataset):
+    def __init__(self, num_samples=100, image_size=640, num_channels=4, num_classes=4, max_boxes=5):
+        self.num_samples = num_samples
+        self.image_size = image_size
+        self.num_channels = num_channels
+        self.num_classes = num_classes
+        self.max_boxes = max_boxes
+
+    def __len__(self):
+        return self.num_samples
+
+    def __getitem__(self, idx):
+        # Random 4-channel image
+        image = torch.rand(self.num_channels, self.image_size, self.image_size)
+
+        # Generate random number of boxes
+        num_boxes = random.randint(1, self.max_boxes)
+        boxes = []
+        labels = []
+
+        for _ in range(num_boxes):
+            # Normalized box [cx, cy, w, h] in [0, 1]
+            cx, cy = np.random.rand(2)
+            w, h = np.random.rand(2) * 0.5  # limit box size
+            boxes.append([cx, cy, w, h])
+            labels.append(random.randint(0, self.num_classes - 1))  # labels from 0 to 3
+
+        target = {
+            "boxes": torch.tensor(boxes, dtype=torch.float32),
+            "labels": torch.tensor(labels, dtype=torch.int64)
+        }
+
+        return image, target
+def collate_fn(batch):
+    images, targets = zip(*batch)
+    images = torch.stack(images)
+    return images, list(targets)
+
 class DetSolver(BaseSolver):
     def __init__(self, model, cfg, criterion, train_dataloader, val_dataloader, device, lr, weight_decay, epochs, log_dir):
         super().__init__()
@@ -135,3 +181,25 @@ class DetSolver(BaseSolver):
             save_on_master(coco_evaluator.coco_eval["bbox"].eval, self.output_dir / "eval.pth")
         
         return
+if __name__ == "__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(device)
+    backbone = DETR_Backbone(4).to(device)
+    neck = DETR_Neck().to(device)
+    model = DroneDETR(backbone, neck).to(device)
+    cfg = SimpleNamespace(checkpoint_freq=10)
+    losses = ['focal', 'boxes', 'cardinality']
+    weight_dict = {
+        'loss_focal': 1.0,
+        'loss_bbox': 5.0,
+        'loss_giou': 2.0,
+    }
+    matcher = HungarianMatcher(weight_dict=weight_dict, use_focal_loss=True).to(device)
+    criterion = SetCriterion(matcher=matcher, weight_dict=weight_dict, losses=losses, num_classes=4).to(device)
+    train_dataset = DummyDetectionDataset(num_samples=200, num_classes=4)
+    val_dataset = DummyDetectionDataset(num_samples=50, num_classes=4)
+
+    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, collate_fn=collate_fn)
+    val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, collate_fn=collate_fn)
+    solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e4, weight_decay = 1e4, epochs = 100, log_dir="./logs")
+    solver.fit()
