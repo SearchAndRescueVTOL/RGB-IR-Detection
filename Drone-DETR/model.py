@@ -8,7 +8,7 @@ import torch.nn as nn
 import math
 import time
 from decoder import RTDETRTransformerv2
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 class FFLayer(nn.Module):
     def __init__(self, embedd_dim,ffn_dim,dropout,activation):
         super().__init__()
