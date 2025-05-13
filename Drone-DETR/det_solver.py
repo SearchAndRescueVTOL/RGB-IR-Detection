@@ -62,7 +62,7 @@ class DetSolver(BaseSolver):
         self.val_dataloader = val_dataloader
         self.device = device
         self.criterion = criterion
-        self.optimizer = torch.optim.AdamW(lr=lr, weight_decay = weight_decay)
+        self.optimizer = torch.optim.AdamW(params = self.model.parameters(), lr=lr, weight_decay = weight_decay)
         self.num_epochs = epochs
         self.ema = ExponentialMovingAverage(model, 0.9999)
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=400, eta_min = 0)
