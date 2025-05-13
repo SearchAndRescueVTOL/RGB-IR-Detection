@@ -68,6 +68,7 @@ class DetSolver(BaseSolver):
         self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=400, eta_min = 0)
         self.lr_warmup_scheduler= Warmup(self.lr_scheduler, 20)
         self.writer = SummaryWriter(log_dir)
+        self.last_epoch = 0
         # Initialize other necessary attributes
     def fit(self):
         print("Start training")
