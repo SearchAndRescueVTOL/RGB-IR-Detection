@@ -200,7 +200,7 @@ class DetSolver(BaseSolver):
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
-    setup(1,0)
+    setup(0,1)
     backbone = DETR_Backbone(4).to(device)
     neck = DETR_Neck().to(device)
     model = DroneDETR(backbone, neck).to(device)
