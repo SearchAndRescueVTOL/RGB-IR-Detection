@@ -219,7 +219,6 @@ if __name__ == "__main__":
                             lr_scheduler=lr_sched,  # Will be set after optimizer
                             lr_warmup_scheduler=Warmup(lr_sched, 20),  # Will be set after scheduler
                             writer=SummaryWriter("./logs"),
-                            checkpoint_freq=10
                           )
     solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e4, weight_decay = 1e4, epochs = 100, log_dir="./logs")
     solver.fit()
