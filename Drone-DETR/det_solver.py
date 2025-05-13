@@ -194,7 +194,12 @@ if __name__ == "__main__":
         'loss_bbox': 5.0,
         'loss_giou': 2.0,
     }
-    matcher = HungarianMatcher(weight_dict=weight_dict, use_focal_loss=True).to(device)
+    weight_dict_matcher = {
+        "cost_class" : 1.0,
+        "cost_bbox": 5.0,
+        "cost_giou": 2.0
+    }
+    matcher = HungarianMatcher(weight_dict=weight_dict_matcher, use_focal_loss=True).to(device)
     criterion = SetCriterion(matcher=matcher, weight_dict=weight_dict, losses=losses, num_classes=4).to(device)
     train_dataset = DummyDetectionDataset(num_samples=200, num_classes=4)
     val_dataset = DummyDetectionDataset(num_samples=50, num_classes=4)
