@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from scipy.optimize import linear_sum_assignment
 from typing import Dict 
 
-from .box_ops import box_cxcywh_to_xyxy, generalized_box_iou
+from box_ops import box_cxcywh_to_xyxy, generalized_box_iou
 
 class HungarianMatcher(nn.Module):
     """This class computes an assignment between the targets and the predictions of the network
