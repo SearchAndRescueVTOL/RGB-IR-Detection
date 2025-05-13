@@ -221,8 +221,8 @@ if __name__ == "__main__":
     val_dataset = DummyDetectionDataset(num_samples=50, num_classes=4)
     train_sampler = DistributedSampler(train_dataset, shuffle=True)
     val_sampler = DistributedSampler(val_dataset, shuffle=False)
-    train_loader = DataLoader(train_dataset, shuffle=(train_sampler is None), batch_size=32, sampler=train_sampler)
-    val_loader = DataLoader(val_dataset, shuffle=(val_sampler is None), batch_size = 32, sampler =val_sampler)
+    train_loader = DataLoader(train_dataset, shuffle=(train_sampler is None), batch_size=32, collate_fn=collate_fn,sampler=train_sampler)
+    val_loader = DataLoader(val_dataset, shuffle=(val_sampler is None), batch_size = 32, collate_fn=collate_fn, sampler =val_sampler)
     optim = torch.optim.AdamW(model.parameters(), lr=1e4, weight_decay=1e4)
     lr_sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=400, eta_min = 0)
     cfg = SimpleNamespace(checkpoint_freq=10,
