@@ -55,7 +55,7 @@ def collate_fn(batch):
 
 class DetSolver(BaseSolver):
     def __init__(self, model, cfg, criterion, train_dataloader, val_dataloader, device, lr, weight_decay, epochs, log_dir):
-        super().__init__()
+        super().__init__(cfg)
         self.model = model
         self.cfg = cfg
         self.train_dataloader = train_dataloader
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     backbone = DETR_Backbone(4).to(device)
     neck = DETR_Neck().to(device)
     model = DroneDETR(backbone, neck).to(device)
-    cfg = SimpleNamespace(checkpoint_freq=10)
+    
     losses = ['focal', 'boxes', 'cardinality']
     weight_dict = {
         'loss_focal': 1.0,
@@ -204,7 +204,22 @@ if __name__ == "__main__":
     train_dataset = DummyDetectionDataset(num_samples=200, num_classes=4)
     val_dataset = DummyDetectionDataset(num_samples=50, num_classes=4)
 
-    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, collate_fn=collate_fn)
-    val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, collate_fn=collate_fn)
+    train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, collate_fn=collate_fn).to(device)
+    val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, collate_fn=collate_fn).to(device)
+    optim = torch.optim.AdamW(model.parameters(), lr=1e4, weight_decay=1e4).to(device)
+    lr_sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=400, eta_min = 0).to(device)
+    cfg = SimpleNamespace(checkpoint_freq=10,
+                            train_dataloader=train_loader,
+                            val_dataloader=val_loader,
+                            device=device,
+                            criterion=criterion,
+                            optimizer=optim,
+                            num_epochs=100,
+                            ema=ExponentialMovingAverage(model, 0.9999),
+                            lr_scheduler=lr_sched,  # Will be set after optimizer
+                            lr_warmup_scheduler=Warmup(lr_sched, 20),  # Will be set after scheduler
+                            writer=SummaryWriter("./logs"),
+                            checkpoint_freq=10
+                          )
     solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e4, weight_decay = 1e4, epochs = 100, log_dir="./logs")
     solver.fit()
