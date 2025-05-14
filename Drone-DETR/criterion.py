@@ -113,7 +113,7 @@ class SetCriterion(nn.Module):
         # alpha_t = self.alpha * target + (1 - self.alpha) * (1 - target)
         # loss = alpha_t * ce_loss * ((1 - p_t) ** self.gamma)
         # loss = loss.mean(1).sum() * src_logits.shape[1] / num_boxes
-        loss = torchvision.ops.sigmoid_focal_loss(src_logits, target, self.alpha, self.gamma, reduction='none')
+        loss = torchvision.ops.sigmoid_focal_loss(src_logits, target*1.0, self.alpha, self.gamma, reduction='none')
         loss = loss.mean(1).sum() * src_logits.shape[1] / num_boxes
 
         return {'loss_focal': loss}
