@@ -256,7 +256,7 @@ class DETR_Neck(nn.Module):
     def __init__(self):
         super().__init__()
         self.d_model = 512
-        self.decoder = RTDETRTransformerv2(num_classes=1, eval_spatial_size=(640,640))
+        self.decoder = RTDETRTransformerv2(num_classes=4, eval_spatial_size=(640,640))
         self.encoder = AIFI()
         self.conv1 = Conv(256, 256)
         self.upsample1 = ConvTranspose(256, 256, k=4, p=1)
