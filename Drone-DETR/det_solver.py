@@ -211,8 +211,8 @@ if __name__ == "__main__":
     }
     weight_dict_matcher = {
         "cost_class" : 1.0,
-        "cost_bbox": 5.0,
-        "cost_giou": 2.0
+        "cost_bbox": 1.0,
+        "cost_giou": 1.0
     }
     matcher = HungarianMatcher(weight_dict=weight_dict_matcher, use_focal_loss=True).to(device)
     criterion = SetCriterion(matcher=matcher, weight_dict=weight_dict, losses=losses, num_classes=4).to(device)
@@ -238,4 +238,4 @@ if __name__ == "__main__":
                           )
     solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e4, weight_decay = 1e4, epochs = 100, log_dir="./logs")
     solver.fit()
-    cleanup()
+    # cleanup()
