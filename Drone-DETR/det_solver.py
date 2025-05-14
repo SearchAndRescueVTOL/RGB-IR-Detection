@@ -50,26 +50,39 @@ class DummyDetectionDataset(Dataset):
         for _ in range(num_boxes):
             cx, cy = np.random.rand(2)
             w, h = np.random.rand(2) * 0.5
+
             x0 = np.clip(cx - w / 2, 0, 1)
             y0 = np.clip(cy - h / 2, 0, 1)
             x1 = np.clip(cx + w / 2, 0, 1)
             y1 = np.clip(cy + h / 2, 0, 1)
-            if x1 <= x0 or y1 <= y0:
-                continue 
 
-            boxes.append([x0, y0, x1, y1])
+            if x1 - x0 <= 1e-6 or y1 - y0 <= 1e-6:
+                continue  # filter out tiny or inverted boxes
+
+            box = [x0, y0, x1, y1]
+            if np.isnan(box).any() or np.isinf(box).any():
+                continue
+
+            boxes.append(box)
             labels.append(random.randint(0, self.num_classes - 1))
 
         if not boxes:
-            boxes.append([0.1, 0.1, 0.2, 0.2])
-            labels.append(0)
+            boxes = [[0.1, 0.1, 0.2, 0.2]]
+            labels = [0]
+
+        boxes = torch.tensor(boxes, dtype=torch.float32)
+        labels = torch.tensor(labels, dtype=torch.int64)
+
+        # Final assertion to catch errors early
+        assert (boxes[:, 2:] >= boxes[:, :2]).all(), f"Bad boxes: {boxes}"
 
         target = {
-            "boxes": torch.tensor(boxes, dtype=torch.float32),
-            "labels": torch.tensor(labels, dtype=torch.int64)
+            "boxes": boxes,
+            "labels": labels
         }
 
         return image, target
+
 def collate_fn(batch):
     images, targets = zip(*batch)
     images = torch.stack(images)
