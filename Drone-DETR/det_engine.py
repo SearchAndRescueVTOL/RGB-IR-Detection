@@ -302,11 +302,9 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         if scaler is not None:
             with torch.autocast(device_type=str(device), cache_enabled=True):
                 outputs = model(samples, targets=targets)
-            
+                print(outputs)
             with torch.autocast(device_type=str(device), enabled=False):
                 loss_dict = criterion(outputs, targets)
-            loss = loss_dict["all_values"]
-            print(loss_dict)
             scaler.scale(loss).backward()
             
             if max_norm > 0:
