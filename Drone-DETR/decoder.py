@@ -468,7 +468,7 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
             lvl_anchors = torch.concat([grid_xy, wh], dim=-1).reshape(-1, h * w, 4)
             anchors.append(lvl_anchors)
 
-        anchors = torch.concat(anchors, dim=1).to(device)
+        anchors = torch.concat(anchors, dim=1)
         valid_mask = ((anchors > self.eps) * (anchors < 1 - self.eps)).all(-1, keepdim=True)
         anchors = torch.log(anchors / (1 - anchors))
         anchors = torch.where(valid_mask, anchors, torch.inf)
@@ -484,7 +484,7 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
 
         # prepare input for decoder
         if self.training or self.eval_spatial_size is None:
-            anchors, valid_mask = self._generate_anchors(spatial_shapes, device=memory.device)
+            anchors, valid_mask = self._generate_anchors(spatial_shapes)
         else:
             anchors = self.anchors
             valid_mask = self.valid_mask
@@ -550,7 +550,6 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
     def forward(self, feats, targets=None):
         # input projection and embedding
         memory, spatial_shapes = self._get_encoder_input(feats)
-        print(spatial_shapes)
         # prepare denoising training
         if self.training and self.num_denoising > 0:
             denoising_logits, denoising_bbox_unact, attn_mask, dn_meta = \
