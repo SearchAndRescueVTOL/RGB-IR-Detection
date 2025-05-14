@@ -550,7 +550,7 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
     def forward(self, feats, targets=None):
         # input projection and embedding
         memory, spatial_shapes = self._get_encoder_input(feats)
-        
+        print(spatial_shapes)
         # prepare denoising training
         if self.training and self.num_denoising > 0:
             denoising_logits, denoising_bbox_unact, attn_mask, dn_meta = \
