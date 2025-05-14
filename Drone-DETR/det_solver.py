@@ -205,9 +205,9 @@ if __name__ == "__main__":
     
     losses = ['focal', 'boxes', 'cardinality']
     weight_dict = {
-        'loss_focal': 1.0,
-        'loss_bbox': 5.0,
-        'loss_giou': 2.0,
+        'focal': 1.0,
+        'boxes': 5.0,
+        'cardinality': 2.0,
     }
     weight_dict_matcher = {
         "cost_class" : 1.0,
