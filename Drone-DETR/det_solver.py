@@ -147,7 +147,7 @@ class DetSolver(BaseSolver):
             self.last_epoch += 1
 
             if self.output_dir:
-                checkpoint_paths = [self.output_dir / 'last.pth']
+                checkpoint_paths = [f"{self.output_dir}/last.pth"]
                 # extra checkpoint before LR drop and every 100 epochs
                 if (epoch + 1) % args.checkpoint_freq == 0:
                     checkpoint_paths.append(self.output_dir / f'checkpoint{epoch:04}.pth')
