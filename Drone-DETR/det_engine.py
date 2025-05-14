@@ -331,7 +331,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         
         # ema 
         if ema is not None:
-            ema.update(model)
+            ema.update_parameters(model)
 
         if lr_warmup_scheduler is not None:
             lr_warmup_scheduler.step()
