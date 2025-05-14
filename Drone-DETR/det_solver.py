@@ -104,6 +104,7 @@ class DetSolver(BaseSolver):
         self.lr_warmup_scheduler= Warmup(self.lr_scheduler, 20)
         self.writer = SummaryWriter(log_dir)
         self.last_epoch = 0
+        self.output_dir = "./outputs"
         # Initialize other necessary attributes
     def fit(self):
         print("Start training")
