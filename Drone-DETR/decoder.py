@@ -577,7 +577,13 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
             self.dec_score_head,
             self.query_pos_head,
             attn_mask=attn_mask)
-        out_bboxes[..., 2:] = out_bboxes[..., 2:].clamp(min=1e-6, max=1.0)
+        # out_bboxes[..., 2:] = out_bboxes[..., 2:].clamp(min=1e-6, max=1.0)
+        out_bboxes[..., 2:] = out_bboxes[..., 2:].clamp(min=1e-6)  # Clamp width and height to be at least 1e-6
+# Ensure that w and h are positive
+# This line ensures that the width and height are positive and non-zero
+        out_bboxes[..., 2] = torch.abs(out_bboxes[..., 2])  # Ensure width (w) is positive
+        out_bboxes[..., 3] = torch.abs(out_bboxes[..., 3])  # Ensure height (h) is positive
+
         if self.training and dn_meta is not None:
             dn_out_bboxes, out_bboxes = torch.split(out_bboxes, dn_meta['dn_num_split'], dim=2)
             dn_out_logits, out_logits = torch.split(out_logits, dn_meta['dn_num_split'], dim=2)
