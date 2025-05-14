@@ -17,6 +17,27 @@ from utils import bias_init_with_prob
 
 __all__ = ['RTDETRTransformerv2']
 
+def safe_clamp_bboxes_cxcywh(boxes, eps=1e-3):
+    """
+    Clamp bounding boxes in (cx, cy, w, h) format.
+    Ensures boxes are valid and stay within image bounds [0, 1].
+    """
+    boxes = boxes.clone()  # avoid modifying original tensor
+
+    cx = boxes[..., 0]
+    cy = boxes[..., 1]
+    w  = boxes[..., 2]
+    h  = boxes[..., 3]
+
+    # Clamp width and height to small positive values (avoid degenerate boxes)
+    w  = w.clamp(min=eps, max=1.0)
+    h  = h.clamp(min=eps, max=1.0)
+
+    # Clamp centers such that box stays within image bounds [0, 1]
+    cx = cx.clamp(min=0.0 + w / 2, max=1.0 - w / 2)
+    cy = cy.clamp(min=0.0 + h / 2, max=1.0 - h / 2)
+
+    return torch.stack([cx, cy, w, h], dim=-1)
 
 class MLP(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, num_layers, act='relu'):
@@ -577,14 +598,7 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
             self.dec_score_head,
             self.query_pos_head,
             attn_mask=attn_mask)
-        out_bboxes = out_bboxes.clone()
-        # out_bboxes[..., 2:] = out_bboxes[..., 2:].clamp(min=1e-6, max=1.0)
-        out_bboxes[..., 2:] = out_bboxes[..., 2:].clamp(min=1e-6)  # Clamp width and height to be at least 1e-6
-# Ensure that w and h are positive
-# This line ensures that the width and height are positive and non-zero
-        out_bboxes[..., 2] = torch.abs(out_bboxes[..., 2])  # Ensure width (w) is positive
-        out_bboxes[..., 3] = torch.abs(out_bboxes[..., 3])  # Ensure height (h) is positive
-
+        out_bboxes= safe_clamp_bboxes_cxcywh(out_bboxes)
         if self.training and dn_meta is not None:
             dn_out_bboxes, out_bboxes = torch.split(out_bboxes, dn_meta['dn_num_split'], dim=2)
             dn_out_logits, out_logits = torch.split(out_logits, dn_meta['dn_num_split'], dim=2)
