@@ -41,20 +41,28 @@ class DummyDetectionDataset(Dataset):
         return self.num_samples
 
     def __getitem__(self, idx):
-        # Random 4-channel image
         image = torch.rand(self.num_channels, self.image_size, self.image_size)
 
-        # Generate random number of boxes
         num_boxes = random.randint(1, self.max_boxes)
         boxes = []
         labels = []
 
         for _ in range(num_boxes):
-            # Normalized box [cx, cy, w, h] in [0, 1]
             cx, cy = np.random.rand(2)
-            w, h = np.random.rand(2) * 0.5  # limit box size
-            boxes.append([cx, cy, w, h])
-            labels.append(random.randint(0, self.num_classes - 1))  # labels from 0 to 3
+            w, h = np.random.rand(2) * 0.5
+            x0 = np.clip(cx - w / 2, 0, 1)
+            y0 = np.clip(cy - h / 2, 0, 1)
+            x1 = np.clip(cx + w / 2, 0, 1)
+            y1 = np.clip(cy + h / 2, 0, 1)
+            if x1 <= x0 or y1 <= y0:
+                continue 
+
+            boxes.append([x0, y0, x1, y1])
+            labels.append(random.randint(0, self.num_classes - 1))
+
+        if not boxes:
+            boxes.append([0.1, 0.1, 0.2, 0.2])
+            labels.append(0)
 
         target = {
             "boxes": torch.tensor(boxes, dtype=torch.float32),
