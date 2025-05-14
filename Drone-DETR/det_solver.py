@@ -18,7 +18,7 @@ import os
 import sys
 import tempfile
 import torch.distributed as dist
-
+from postProcess import RTDETRPostProcessor
 def setup(rank, world_size):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '12355'
@@ -89,9 +89,10 @@ def collate_fn(batch):
     return images, list(targets)
 
 class DetSolver(BaseSolver):
-    def __init__(self, model, cfg, criterion, train_dataloader, val_dataloader, device, lr, weight_decay, epochs, log_dir):
+    def __init__(self, model, cfg, criterion, train_dataloader, val_dataloader, device, lr, weight_decay, epochs, log_dir, postprocessor):
         super().__init__(cfg)
         self.model = model
+        self.postprocessor=postprocessor
         self.cfg = cfg
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
@@ -246,6 +247,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(val_dataset, shuffle=False, batch_size = 8, collate_fn=collate_fn)
     optim = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=400, eta_min = 0)
+    postProc = RTDETRPostProcessor(4, True)
     cfg = SimpleNamespace(checkpoint_freq=10,
                             train_dataloader=train_loader,
                             val_dataloader=val_loader,
@@ -257,7 +259,8 @@ if __name__ == "__main__":
                             lr_scheduler=lr_sched,  # Will be set after optimizer
                             lr_warmup_scheduler=Warmup(lr_sched, 20),  # Will be set after scheduler
                             writer=SummaryWriter("./logs"),
+                            postprocessor=postProc
                           )
-    solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e-4, weight_decay = 1e-4, epochs = 100, log_dir="./logs")
+    solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e-4, weight_decay = 1e-4, epochs = 100, log_dir="./logs", postprocessor=postProc)
     solver.fit()
     # cleanup()
