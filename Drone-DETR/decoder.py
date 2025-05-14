@@ -598,7 +598,8 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
             self.dec_score_head,
             self.query_pos_head,
             attn_mask=attn_mask)
-        out_bboxes= safe_clamp_bboxes_cxcywh(out_bboxes)
+        with torch.no_grad:
+            out_bboxes[..., 2:] = out_bboxes[..., 2:].clamp(min=1e-6, max=1.0)
         if self.training and dn_meta is not None:
             dn_out_bboxes, out_bboxes = torch.split(out_bboxes, dn_meta['dn_num_split'], dim=2)
             dn_out_logits, out_logits = torch.split(out_logits, dn_meta['dn_num_split'], dim=2)
