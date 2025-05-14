@@ -467,7 +467,8 @@ class RTDETRTransformerv2(nn.Module):# can optimize for inference time
             wh = torch.ones_like(grid_xy) * grid_size * (2.0 ** lvl)
             lvl_anchors = torch.concat([grid_xy, wh], dim=-1).reshape(-1, h * w, 4)
             anchors.append(lvl_anchors)
-
+        for anchor in anchors:
+            print(anchor.shape)
         anchors = torch.concat(anchors, dim=1).to(device)
         valid_mask = ((anchors > self.eps) * (anchors < 1 - self.eps)).all(-1, keepdim=True)
         anchors = torch.log(anchors / (1 - anchors))
