@@ -262,7 +262,7 @@ if __name__ == "__main__":
                             criterion=criterion,
                             optimizer=optim,
                             num_epochs=100,
-                            ema=ExponentialMovingAverage(model, 0.9999),
+                            ema=ExponentialMovingAverage(model, 0.9999).to(device),
                             lr_scheduler=lr_sched,  # Will be set after optimizer
                             lr_warmup_scheduler=Warmup(lr_sched, 20),  # Will be set after scheduler
                             writer=SummaryWriter("./logs"),
