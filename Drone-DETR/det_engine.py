@@ -364,6 +364,7 @@ def evaluate(model: torch.nn.Module, criterion: torch.nn.Module, postprocessor, 
     criterion.eval()
     coco_evaluator.cleanup()
     iou_types = coco_evaluator.iou_types
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     metric_logger = MetricLogger(delimiter="  ")
     header = 'Test:'
