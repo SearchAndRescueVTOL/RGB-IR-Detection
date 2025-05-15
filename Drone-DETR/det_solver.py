@@ -12,6 +12,8 @@ from criterion import SetCriterion
 from matcher import HungarianMatcher
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.distributed import DistributedSampler
+from cocoEval import CocoEvaluator
+from faster_coco_eval import COCO
 import numpy as np
 import random
 import os
@@ -78,7 +80,8 @@ class DummyDetectionDataset(Dataset):
 
         target = {
             "boxes": boxes,
-            "labels": labels
+            "labels": labels,
+            "image_id": torch.tensor([idx])
         }
 
         return image, target
@@ -89,10 +92,11 @@ def collate_fn(batch):
     return images, list(targets)
 
 class DetSolver(BaseSolver):
-    def __init__(self, model, cfg, criterion, train_dataloader, val_dataloader, device, lr, weight_decay, epochs, log_dir, postprocessor):
+    def __init__(self, model, cfg, criterion, train_dataloader, val_dataloader, device, lr, weight_decay, epochs, log_dir, postprocessor, evaluator):
         super().__init__(cfg)
         self.model = model
         self.postprocessor=postprocessor
+        self.evaluator = evaluator
         self.cfg = cfg
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
@@ -248,6 +252,8 @@ if __name__ == "__main__":
     optim = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-4)
     lr_sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, T_max=400, eta_min = 0)
     postProc = RTDETRPostProcessor(4, True)
+    coco_gt = COCO("dummy_coco_annotations.json")
+    evaluator=CocoEvaluator(coco_gt= coco_gt, iou_types=["bbox"])
     cfg = SimpleNamespace(checkpoint_freq=10,
                             train_dataloader=train_loader,
                             val_dataloader=val_loader,
@@ -261,6 +267,6 @@ if __name__ == "__main__":
                             writer=SummaryWriter("./logs"),
                             postprocessor=postProc
                           )
-    solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e-4, weight_decay = 1e-4, epochs = 100, log_dir="./logs", postprocessor=postProc)
+    solver = DetSolver(model, cfg, criterion, train_loader, val_loader, device, lr=1e-4, weight_decay = 1e-4, epochs = 100, log_dir="./logs", postprocessor=postProc, evaluator=evaluator)
     solver.fit()
     # cleanup()
