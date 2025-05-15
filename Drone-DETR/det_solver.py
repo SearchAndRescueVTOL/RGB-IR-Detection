@@ -201,7 +201,7 @@ class DetSolver(BaseSolver):
 
                 # for evaluation logs
                 if coco_evaluator is not None:
-                    (f"{self.output_dir}/eval").mkdir(exist_ok=True)
+                    os.makedirs(f"{self.output_dir}/eval", exist_ok=True)
                     if "bbox" in coco_evaluator.coco_eval:
                         filenames = ['latest.pth']
                         if epoch % 50 == 0:
