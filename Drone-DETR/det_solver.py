@@ -196,7 +196,7 @@ class DetSolver(BaseSolver):
             }
 
             if self.output_dir and is_main_process():
-                with (f"{self.output_dir}/log.txt").open("a") as f:
+                with open(f"{self.output_dir}/log.txt", "a") as f:
                     f.write(json.dumps(log_stats) + "\n")
 
                 # for evaluation logs
