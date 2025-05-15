@@ -156,7 +156,7 @@ class DetSolver(BaseSolver):
                 checkpoint_paths = [f"{self.output_dir}/last.pth"]
                 # extra checkpoint before LR drop and every 100 epochs
                 if (epoch + 1) % args.checkpoint_freq == 0:
-                    checkpoint_paths.append(self.output_dir / f'checkpoint{epoch:04}.pth')
+                    checkpoint_paths.append(f"{self.output_dir}/checkpoint{epoch:04}.pth")
                 for checkpoint_path in checkpoint_paths:
                     save_on_master(self.ema.module.state_dict(), checkpoint_path)
 
@@ -184,7 +184,7 @@ class DetSolver(BaseSolver):
                     best_stat[k] = test_stats[k][0]
 
                 if best_stat['epoch'] == epoch and self.output_dir:
-                    save_on_master(self.state_dict(), self.output_dir / 'best.pth')
+                    save_on_master(self.state_dict(), f"{self.output_dir}/best.pth")
 
             print(f'best_stat: {best_stat}')
 
@@ -196,19 +196,19 @@ class DetSolver(BaseSolver):
             }
 
             if self.output_dir and is_main_process():
-                with (self.output_dir / "log.txt").open("a") as f:
+                with (f"{self.output_dir}/log.txt").open("a") as f:
                     f.write(json.dumps(log_stats) + "\n")
 
                 # for evaluation logs
                 if coco_evaluator is not None:
-                    (self.output_dir / 'eval').mkdir(exist_ok=True)
+                    (f"{self.output_dir}/eval").mkdir(exist_ok=True)
                     if "bbox" in coco_evaluator.coco_eval:
                         filenames = ['latest.pth']
                         if epoch % 50 == 0:
                             filenames.append(f'{epoch:03}.pth')
                         for name in filenames:
                             torch.save(coco_evaluator.coco_eval["bbox"].eval,
-                                    self.output_dir / "eval" / name)
+                                    f"{self.output_dir}/eval/{name}")
 
         total_time = time.time() - start_time
         total_time_str = str(datetime.timedelta(seconds=int(total_time)))
@@ -221,7 +221,7 @@ class DetSolver(BaseSolver):
                 self.val_dataloader, self.evaluator, self.device)
                 
         if self.output_dir:
-            save_on_master(coco_evaluator.coco_eval["bbox"].eval, self.output_dir / "eval.pth")
+            save_on_master(coco_evaluator.coco_eval["bbox"].eval, f"{self.output_dir}/eval.pth")
         
         return
 if __name__ == "__main__":
