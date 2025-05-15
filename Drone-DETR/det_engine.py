@@ -369,8 +369,8 @@ def evaluate(model: torch.nn.Module, criterion: torch.nn.Module, postprocessor, 
     header = 'Test:'
     
     for samples, targets in metric_logger.log_every(data_loader, 10, header):
-        samples = samples
-        targets = [{k: v for k, v in t.items()} for t in targets]
+        samples = samples.to(device)
+        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
         outputs = model(samples)
 
