@@ -81,7 +81,8 @@ class DummyDetectionDataset(Dataset):
         target = {
             "boxes": boxes,
             "labels": labels,
-            "image_id": torch.tensor([idx])
+            "image_id": torch.tensor([idx]),
+            "orig_size": (640,640)
         }
 
         return image, target
